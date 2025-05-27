@@ -1,0 +1,116 @@
+{
+  "formulaire": {
+    "data": [
+      {
+        "id": 1,
+        "firstname": "Alice",
+        "lastname": "Smith",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 2,
+          "vote2": 3,
+          "vote3": 4
+        }
+      },
+      {
+        "id": 2,
+        "firstname": "Bob",
+        "lastname": "Martin",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 1,
+          "vote2": 3,
+          "vote3": 5
+        }
+      },
+      {
+        "id": 3,
+        "firstname": "Chloe",
+        "lastname": "Dubois",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 1,
+          "vote2": 2,
+          "vote3": 4
+        }
+      },
+      {
+        "id": 4,
+        "firstname": "David",
+        "lastname": "Leroy",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 1,
+          "vote2": 2,
+          "vote3": 3
+        }
+      },
+      {
+        "id": 5,
+        "firstname": "Emma",
+        "lastname": "Moreau",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 2,
+          "vote2": 3,
+          "vote3": 4
+        }
+      },
+      {
+        "id": 6,
+        "firstname": "Felix",
+        "lastname": "Bernard",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 1,
+          "vote2": 5,
+          "vote3": 7
+        }
+      },
+      {
+        "id": 7,
+        "firstname": "Grace",
+        "lastname": "Petit",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 2,
+          "vote2": 4,
+          "vote3": 6
+        }
+      },
+      {
+        "id": 8,
+        "firstname": "Hugo",
+        "lastname": "Roux",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 3,
+          "vote2": 5,
+          "vote3": 7
+        }
+      },
+      {
+        "id": 9,
+        "firstname": "Ines",
+        "lastname": "Faure",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 1,
+          "vote2": 6,
+          "vote3": 8
+        }
+      },
+      {
+        "id": 10,
+        "firstname": "Julien",
+        "lastname": "Girard",
+        "promo": "L3",
+        "Votes": {
+          "vote1": 2,
+          "vote2": 4,
+          "vote3": 9
+        }
+      }
+    ]
+  }
+}
