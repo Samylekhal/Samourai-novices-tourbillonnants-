@@ -22,11 +22,12 @@ class TeacherDashboardProject:
 
         self.project = project
 
+    # Method to get the number of points a student can vote for
     def set_project_num_points(self, num_points: int):
         self.project.num_points = num_points
         self.dao.update_project(self.project)
 
-
+    # Method to get the project details
     def add_student(self, student_username: str) -> Result[Student]:
         result = self.dao.get_student_by_username(student_username)
         if not result.success:
@@ -42,6 +43,7 @@ class TeacherDashboardProject:
         self.dao.update_project(self.project)
         return Result(True, f"Student '{student_username}' added successfully.", data=student)
 
+    # Method to remove a student from the project
     def remove_student(self, student_username: str) -> Result[Student]:
         for student in self.project.students:
             if student.username == student_username:
@@ -51,6 +53,7 @@ class TeacherDashboardProject:
         
         return Result(False, f"Student '{student_username}' is not in the project.")
 
+    # Method to close votes manually
     def close_votes_manually(self) -> Result[None]:
         if self.project.closed_vote:
             return Result(False, "Votes are already closed for this project.")
@@ -60,6 +63,7 @@ class TeacherDashboardProject:
         self.dao.update_project(self.project)
         return Result(True, f"Votes for project '{self.project.name}' have been manually closed.")
 
+    # Method to set the vote close time
     def set_vote_close_time(self, close_time: datetime) -> Result[None]:
         if self.project.closed_vote:
             return Result(False, "Cannot set vote close time because votes are already closed.")
@@ -71,7 +75,7 @@ class TeacherDashboardProject:
         self.dao.update_project(self.project) 
         return Result(True, f"Vote close time set to {close_time.isoformat()} for project '{self.project.name}'.")
 
-
+    # Method to reopen votes
     def reopen_votes(self) -> Result[None]:
         if not self.project.closed_vote:
             return Result(False, "Votes are already open.")
@@ -82,6 +86,7 @@ class TeacherDashboardProject:
         return Result(True, f"Votes reopened for project '{self.project.name}'.")
 
 
+    # Method to cluster students based on their project preferences
     def cluster_students(self, k: int, total_iterations: int = 5000) -> Result[None]:
         """
         Cluster students based on their project preferences.
@@ -118,6 +123,7 @@ class TeacherDashboardProject:
             return A, index_to_name
 
 
+        # Function to compute the score of a group based on affinities
         def compute_group_score(group: List[int], A: List[List[int]]) -> int:
             """Calcule le score total d'affinité d'un groupe."""
             if len(group) <= 1:
@@ -127,21 +133,21 @@ class TeacherDashboardProject:
             for i in range(len(group)):
                 for j in range(i + 1, len(group)):
                     idx1, idx2 = group[i], group[j]
-                    # On compte les affinités dans les deux sens
+                    #We compute the score for both directions (i to j and j to i)
                     score += A[idx1][idx2] + A[idx2][idx1]
             
             return score
 
         def compute_individual_score(group: List[int], new_idx: int, A: List[List[int]]) -> int:
-            """Calcule le score qu'apporterait l'ajout d'une personne à un groupe."""
+            """Compute the score of adding a new individual to a group."""
             return sum(A[new_idx][i] + A[i][new_idx] for i in group)
 
         def count_satisfied_individuals(groups: List[List[int]], A: List[List[int]]) -> int:
-            """Compte le nombre d'individus ayant au moins une affinité dans leur groupe."""
+            """Compute the number of individuals satisfied in their groups."""
             satisfied = 0
             for group in groups:
                 for person in group:
-                    # Une personne est satisfaite si elle a une affinité (vote) avec au moins une autre personne du groupe
+                    #A person is satisfied if they have an affinity (vote) with at least one other person in the group
                     has_affinity = any(A[person][other] > 0 for other in group if other != person)
                     if has_affinity:
                         satisfied += 1
@@ -149,46 +155,41 @@ class TeacherDashboardProject:
 
         def assign_groups_with_constraints(n: int, k: int, A: List[List[int]],  min_affinity_per_person: int) -> Tuple[List[List[int]], List[int], bool]:
             """
-            Assigne les étudiants aux groupes en respectant les contraintes d'affinité.
-            
-            Retourne:
-                - groups: Liste des groupes
-                - group_scores: Scores de chaque groupe
-                - constraint_satisfied: True si la contrainte minimale est respectée
+            Assign students to k groups while respecting affinity constraints.
             """
-            # Taille visée pour chaque groupe
-            group_sizes = [n // k + (1 if i < n % k else 0) for i in range(k)] # Taille variable pour équilibrer les groupes
-            groups = [[] for _ in range(k)] # Liste des groupes
-            group_scores = [0 for _ in range(k)] # Scores initiaux des groupes
+            #Target size for each group
+            group_sizes = [n // k + (1 if i < n % k else 0) for i in range(k)] # variable size for each group
+            groups = [[] for _ in range(k)] # List of groups
+            group_scores = [0 for _ in range(k)] # score of each group
             
-            # Liste des étudiants à assigner
+            #List of remaining students to assign
             remaining = list(range(n))
-            random.shuffle(remaining)  # Mélanger pour une distribution aléatoire initiale
+            random.shuffle(remaining)  #Shuffle the remaining students to randomize the assignment
 
-            # Fonction pour vérifier si une personne a au moins une affinité dans le groupe
+            #Function to check if a student has affinity in a group
             def has_affinity_in_group(group: List[int], idx: int) -> bool:
                 return any(A[idx][peer] > 0 or A[peer][idx] > 0 for peer in group)
             
-            # Phase 1: Essayer d'assigner en respectant les contraintes d'affinité
+            #try to assign each student to a group
             while remaining:
                 idx = remaining.pop(0)
                 candidates = []
                 
                 for g_id in range(k):
                     if len(groups[g_id]) < group_sizes[g_id]:
-                        # Calculer le score potentiel
+                        # Computer each candidate's score
                         score = compute_individual_score(groups[g_id], idx, A)
                         
-                        # Vérifier si la contrainte d'affinité serait respectée
+                        # Verify if the group will have affinity with the new student
                         will_have_affinity = (not groups[g_id] or 
                                             has_affinity_in_group(groups[g_id], idx))
                         
-                        # Priorité aux groupes où la contrainte est respectée
+                        # Priority is 1 if the group will have affinity, otherwise 0
                         priority = 1 if will_have_affinity else 0
                         candidates.append((priority, score, random.random(), g_id))
                 
                 if candidates:
-                    # Trier par priorité (contrainte respectée), puis par score
+                    # Trier par priorité (contrainte respectée), puis par score 
                     candidates.sort(reverse=True)
                     _, _, _, best_group = candidates[0]
                     groups[best_group].append(idx)

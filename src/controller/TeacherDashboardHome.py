@@ -16,12 +16,13 @@ class TeacherDashboardHome:
         self.dao = dao
         self.projects: list[Project] = dao.get_projects_by_teacher(self.teacher)
     
+    # Method to create a new project
     def new_project(self, name: str, num_points: int) -> Project:
         project = self.dao.new_project(self.teacher, name, num_points)
         self.projects.append(project)
         return project 
 
-    
+    # Method to get a TeacherDashboardProject by project ID
     def get_project_dashboard_by_id(self, id: int) -> TeacherDashboardProject:
         """
         Return a TeacherDashboardProject object for a given project ID.

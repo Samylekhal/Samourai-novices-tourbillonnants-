@@ -9,6 +9,7 @@ class StudentDashboardHome:
         self.dao = dao
         self.projects: list[Project] = dao.get_projects_by_student(student)
 
+    # Method to get the student's projects where the student is a member 
     def get_project_dashboard_by_id(self, project_id: int) -> StudentDashboardProject:
         for project in self.projects:
             if project.id == project_id:

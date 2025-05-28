@@ -12,6 +12,7 @@ class LoginDashboard:
         self.dao = dao
         self.auth_path = user_auth_path
 
+    # Method to handle user login
     def login(self, username: str, password: str) -> Result[object]:
         if not os.path.exists(self.auth_path):
             return Result(False, f"Auth file not found: {self.auth_path}")

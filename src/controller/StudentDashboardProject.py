@@ -31,7 +31,7 @@ class StudentDashboardProject:
         self.points = points_result.data if points_result.success else 0
 
 
-
+    # Method to get the student's form to attribute points
     def attribute_points_to_student(self, recipient: Student, points: int) -> str:
         if self.project.closed_vote:
             return "Voting is closed for this project."
