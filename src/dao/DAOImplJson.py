@@ -48,7 +48,19 @@ class DAOImplJson(DAO):
                         project_num_points = attributes["num_points"]
                         vote_close_time_str = attributes.get("vote_close_time")
                         project_vote_close_time = datetime.fromisoformat(vote_close_time_str) if vote_close_time_str else None
-                        project = Project(project_id, project_name, project_num_points, vote_close_time=project_vote_close_time)
+                        closed_vote = attributes.get("closed_vote", False)
+                        vote_close_time = attributes.get("vote_close_time")
+                        if vote_close_time is not None:
+                            vote_close_time = datetime.fromisoformat(vote_close_time)
+
+                        project = Project(
+                            id=project_id,
+                            name=project_name,
+                            num_points=project_num_points,
+                            closed_vote=closed_vote,
+                            vote_close_time=vote_close_time
+                        )
+
                         projects.append(project)
 
         return projects
@@ -328,7 +340,19 @@ class DAOImplJson(DAO):
                         project_num_points = attributes["num_points"]
                         vote_close_time_str = attributes.get("vote_close_time")
                         project_vote_close_time = datetime.fromisoformat(vote_close_time_str) if vote_close_time_str else None
-                        project = Project(project_id, project_name, project_num_points, vote_close_time=project_vote_close_time)
+                        closed_vote = attributes.get("closed_vote", False)
+                        vote_close_time = attributes.get("vote_close_time")
+                        if vote_close_time is not None:
+                            vote_close_time = datetime.fromisoformat(vote_close_time)
+
+                        project = Project(
+                            id=project_id,
+                            name=project_name,
+                            num_points=project_num_points,
+                            closed_vote=closed_vote,
+                            vote_close_time=vote_close_time
+                        )
+
                         projects.append(project)
 
         return projects

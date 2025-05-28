@@ -33,6 +33,9 @@ class StudentDashboardProject:
 
 
     def attribute_points_to_student(self, recipient: Student, points: int) -> str:
+        if self.project.closed_vote:
+            return "Voting is closed for this project."
+
         if points <= 0:
             return "Points must be greater than zero."
 
@@ -66,6 +69,7 @@ class StudentDashboardProject:
         self.points -= net_needed
 
         return "Points successfully attributed."
+
 
 
 

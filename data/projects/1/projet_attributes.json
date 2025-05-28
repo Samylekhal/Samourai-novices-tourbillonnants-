@@ -1,7 +1,7 @@
 {
     "id": "1",
-    "name": "Mega Pattern",
+    "name": "Design Pattern",
     "num_points": 100,
-    "vote_close_time": "2026-11-01T23:59:00",
-    "closed_vote": false
+    "vote_close_time": null,
+    "closed_vote": true
 }

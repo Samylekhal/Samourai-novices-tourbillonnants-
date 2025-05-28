@@ -40,7 +40,7 @@
             "password": "hello",
             "roles": "student",
             "first_name": "Lucie",
-            "last_name": "Lefèvre"
+            "last_name": "Lefevre"
         },
         {
             "username": "emma.durand",
@@ -67,7 +67,7 @@
             "username": "lea.fournier",
             "password": "hello",
             "roles": "student",
-            "first_name": "Léa",
+            "first_name": "Lea",
             "last_name": "Fournier"
         },
         {

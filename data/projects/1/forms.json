@@ -1,76 +1,76 @@
 {
-  "forms": [
-    {
-      "student_username": "lucie.lefevre",
-      "votes": {
-        "marion.dupont": 25,
-        "pierre.martin": 25,
-        "emma.durand": 25,
-        "thomas.bernard": 25
-      }
-    },
-    {
-      "student_username": "marion.dupont",
-      "votes": {
-        "lucie.lefevre": 25,
-        "pierre.martin": 25,
-        "emma.durand": 25,
-        "julien.moreau": 25
-      }
-    },
-    {
-      "student_username": "pierre.martin",
-      "votes": {
-        "marion.dupont": 25,
-        "emma.durand": 25,
-        "thomas.bernard": 25,
-        "lea.fournier": 25
-      }
-    },
-    {
-      "student_username": "emma.durand",
-      "votes": {
-        "pierre.martin": 25,
-        "thomas.bernard": 25,
-        "julien.moreau": 25,
-        "jean.valjean": 25
-      }
-    },
-    {
-      "student_username": "thomas.bernard",
-      "votes": {
-        "lucie.lefevre": 25,
-        "julien.moreau": 25,
-        "lea.fournier": 25,
-        "jean.valjean": 25
-      }
-    },
-    {
-      "student_username": "julien.moreau",
-      "votes": {
-        "lucie.lefevre": 25,
-        "marion.dupont": 25,
-        "thomas.bernard": 25,
-        "jean.valjean": 25
-      }
-    },
-    {
-      "student_username": "lea.fournier",
-      "votes": {
-        "lucie.lefevre": 25,
-        "emma.durand": 25,
-        "julien.moreau": 25,
-        "jean.valjean": 25
-      }
-    },
-    {
-      "student_username": "jean.valjean",
-      "votes": {
-        "marion.dupont": 25,
-        "pierre.martin": 25,
-        "emma.durand": 25,
-        "thomas.bernard": 25
-      }
-    }
-  ]
+    "forms": [
+        {
+            "student_username": "jean.valjean",
+            "votes": {
+                "marion.dupont": 25,
+                "pierre.martin": 25,
+                "emma.durand": 25,
+                "thomas.bernard": 25
+            }
+        },
+        {
+            "student_username": "lucie.lefevre",
+            "votes": {
+                "marion.dupont": 25,
+                "pierre.martin": 25,
+                "emma.durand": 25,
+                "thomas.bernard": 25
+            }
+        },
+        {
+            "student_username": "julien.moreau",
+            "votes": {
+                "lucie.lefevre": 25,
+                "marion.dupont": 25,
+                "thomas.bernard": 25,
+                "jean.valjean": 25
+            }
+        },
+        {
+            "student_username": "marion.dupont",
+            "votes": {
+                "lucie.lefevre": 3,
+                "pierre.martin": 25,
+                "emma.durand": 25,
+                "julien.moreau": 25
+            }
+        },
+        {
+            "student_username": "lea.fournier",
+            "votes": {
+                "lucie.lefevre": 25,
+                "emma.durand": 25,
+                "julien.moreau": 25,
+                "jean.valjean": 25
+            }
+        },
+        {
+            "student_username": "pierre.martin",
+            "votes": {
+                "marion.dupont": 25,
+                "emma.durand": 25,
+                "thomas.bernard": 25,
+                "lea.fournier": 25
+            }
+        },
+        {
+            "student_username": "emma.durand",
+            "votes": {
+                "pierre.martin": 25,
+                "thomas.bernard": 25,
+                "julien.moreau": 25,
+                "jean.valjean": 25
+            }
+        },
+        {
+            "student_username": "thomas.bernard",
+            "votes": {
+                "lucie.lefevre": 25,
+                "julien.moreau": 25,
+                "lea.fournier": 25,
+                "jean.valjean": 25
+            }
+        }
+    ]
 }

@@ -1,4 +1,3 @@
-from .Generator import Generator, Format
 from .model.Student import Student
 from .model.Group import Group
 from .model.StudentForm import StudentForm
