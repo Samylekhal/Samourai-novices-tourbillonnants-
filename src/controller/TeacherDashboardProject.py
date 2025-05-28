@@ -88,39 +88,35 @@ class TeacherDashboardProject:
         This is a placeholder for the actual clustering logic.
         """
 
-        student_forms = self.dao.get_student_forms_by_project(self.project.id).data
-        usernames = [sf.student.username for sf in student_forms]
-        votes_par_index = {
-            sf.student.username: [vote.username for vote in sf.votes]
-            for sf in student_forms
-        }
-
-        def create_affinity_matrix(usernames: List[str], votes_par_index: Dict[str, List[str]]) -> List[List[int]]:
+        def create_affinity_matrix(usernames: List[str], votes_par_index: Dict[str, Dict[str, int]]) -> Tuple[List[List[int]], Dict[int, str]]:
             """
-            Crée la matrice d'affinité (0 = aucun vote, 1 = vote unilatéral) à partir des usernames.
-        
+            Crée la matrice d'affinité pondérée à partir des usernames.
+            
             Args:
-                usernames: liste ordonnée des usernames (indexés de 0 à n-1)
-                votes_par_index: dictionnaire {votant: [voté1, voté2, ...]}
-
+                usernames: liste ordonnée des usernames
+                votes_par_index: dictionnaire {votant: {voté: points}}
+            
             Returns:
-                Matrice carrée A[n][n] des affinités.
+                Matrice A[n][n] avec les points d'affinité pondérés.
             """
             n = len(usernames)
             name_to_index = {username: i for i, username in enumerate(usernames)}
+            index_to_name = {i: username for username, i in name_to_index.items()}
             A = [[0] * n for _ in range(n)]
 
-            for voter, voted_list in votes_par_index.items():
+            for voter, voted_dict in votes_par_index.items():
                 i = name_to_index.get(voter)
                 if i is None:
                     continue
-                for voted in voted_list:
+                for voted, points in voted_dict.items():
                     j = name_to_index.get(voted)
                     if j is not None and i != j:
-                        A[i][j] = 1
-            print(f"Created affinity matrix of size {n}x{n} based on votes.")
+                        A[i][j] = points  # Use points instead of binary vote
+
+            print(f"Created affinity matrix of size {n}x{n} based on weighted votes.")
             print(A)
-            return A
+            return A, index_to_name
+
 
         def compute_group_score(group: List[int], A: List[List[int]]) -> int:
             """Calcule le score total d'affinité d'un groupe."""
@@ -233,7 +229,7 @@ class TeacherDashboardProject:
                         total += pair_score
             print(f"  Score total calculé: {total}")
 
-        def optimize_groups(k: int, votes_par_index, n, total_iterations: int = 5000,) -> None:
+        def optimize_groups(k: int, votes_par_index, n, total_iterations: int = 5000) -> None:
             """
             Fonction principale d'optimisation des groupes.
             Elle utilise l'approche d'un algorithme glouton pour assigner les étudiants
@@ -245,7 +241,7 @@ class TeacherDashboardProject:
             print(f"Nombre total d'itérations: {total_iterations}")
 
             # Créer la matrice d'affinité
-            A = create_affinity_matrix(etudiants, votes_par_index)
+            A, index_to_name = create_affinity_matrix(etudiants, votes_par_index)
 
             # Initialisation de la meilleure solution
             global_best_groups = None
@@ -295,7 +291,6 @@ class TeacherDashboardProject:
             print(f"Taux de satisfaction: {satisfied_count/n*100:.1f}%")
 
             print(f"\nRépartition finale:\n")
-            print(f"GRRRROUUUPS: {groups}")
             for i, group in enumerate(groups):
                 
                 score = group_scores[i]
@@ -303,8 +298,10 @@ class TeacherDashboardProject:
                     1 for person in group if any(A[person][other] > 0 for other in group if other != person)
                 )
 
+                names = [index_to_name[idx] for idx in group]
                 print(f"Groupe {i+1} ({len(group)} personnes, score: {score}, {satisfied_in_group}/{len(group)} satisfaites):")
-                #print(f"  {', '.join(noms)}")
+                print(f"  {', '.join(names)}")
+
 
                 if score < len(group):
                     print(f"Analyse détaillée (score {score} semble faible pour {satisfied_in_group} satisfaites):")
@@ -313,15 +310,10 @@ class TeacherDashboardProject:
         students = self.dao.get_students_by_project(self.project.id).data
         etudiants = [s.username for s in students]
         student_forms = self.dao.get_student_forms_by_project(self.project.id).data
-        votes_par_index = {sf.student.username: [vote.username for vote in sf.votes] for sf in student_forms}
-        n = len(etudiants)
-        optimize_groups(k, votes_par_index, n, total_iterations)
-        return Result(True, "Clustering students based on project preferences is not yet implemented.")
-        
-        students = self.dao.get_students_by_project(self.project.id).data
-        etudiants = [s.username for s in students]
-        student_forms = self.dao.get_student_forms_by_project(self.project.id).data
-        votes_par_index = {sf.student.username: [vote.username for vote in sf.votes] for sf in student_forms}
+        votes_par_index = {
+            sf.student.username: {vote.username: points for vote, points in sf.votes}
+            for sf in student_forms
+        }
         n = len(etudiants)
         optimize_groups(k, votes_par_index, n, total_iterations)
         return Result(True, "Clustering students based on project preferences is not yet implemented.")
