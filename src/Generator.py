@@ -1,7 +1,7 @@
 
 from .Format import Format
 from .model.Student import Student
-from .StudentForm import StudentForm
+from .model.StudentForm import StudentForm
 from .model.Group import Group
 import json
 

@@ -10,10 +10,10 @@
 import os
 import json
 from .DAO import DAO
-from model.Project import Project
-from model.Teacher import Teacher
-from model.Student import Student
-from utils.Result import Result
+from ..model.Project import Project
+from ..model.Teacher import Teacher
+from ..model.Student import Student
+from ..utils.Result import Result
 
 class DAOImplJson(DAO):
     def __init__(self, filepath: str = "data"):

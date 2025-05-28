@@ -7,10 +7,10 @@
 # - save_project(teacher: Teacher, project: Project) -> None .
 
 from abc import ABC, abstractmethod
-from model.Teacher import Teacher
-from model.Project import Project
-from model.Student import Student
-from utils.Result import Result
+from ..model.Teacher import Teacher
+from ..model.Project import Project
+from ..model.Student import Student
+from ..utils.Result import Result
 
 class DAO(ABC):
     @abstractmethod

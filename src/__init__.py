@@ -1,10 +1,10 @@
 from .Generator import Generator, Format
 from .model.Student import Student
-from .StudentForm import StudentForm
 from .model.Group import Group
-from .Teacher import Teacher
-from .Project import Project
-from .TeacherDashboardHome import TeacherDashboardHome
-from .TeacherDashboardProject import TeacherDashboardProject
-from .DAO import DAO
-from .DAOImplJson import DAOImplJson
+from .model.StudentForm import StudentForm
+from .model.Teacher import Teacher
+from .model.Project import Project
+from .controller.TeacherDashboardHome import TeacherDashboardHome
+from .controller.TeacherDashboardProject import TeacherDashboardProject
+from .dao.DAO import DAO
+from .dao.DAOImplJson import DAOImplJson

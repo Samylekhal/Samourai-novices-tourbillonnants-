@@ -1,9 +1,9 @@
 # TeacherDashboardProject.py
-from dao.DAO import DAO
-from model.Teacher import Teacher
-from model.Project import Project
-from model.Student import Student
-from utils.Result import Result
+from ..dao.DAO import DAO
+from ..model.Teacher import Teacher
+from ..model.Project import Project
+from ..model.Student import Student
+from ..utils.Result import Result
 
 from datetime import datetime
 

@@ -5,9 +5,9 @@
 # - - Students enrolled
 # - - Number of students a student can vote to be in a group with
 
-from dao.DAO import DAO
-from model.Project import Project
-from model.Teacher import Teacher
+from ..dao.DAO import DAO
+from ..model.Project import Project
+from ..model.Teacher import Teacher
 from .TeacherDashboardProject import TeacherDashboardProject
 
 class TeacherDashboardHome:
