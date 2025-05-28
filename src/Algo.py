@@ -57,7 +57,7 @@ def count_satisfied_individuals(groups: List[List[int]], A: List[List[int]]) -> 
     for group in groups:
         for person in group:
             # Une personne est satisfaite si elle a une affinité (vote) avec au moins une autre personne du groupe
-            has_affinity = any(A[person][other] > 0 or A[other][person] > 0 for other in group if other != person)
+            has_affinity = any(A[person][other] > 0 for other in group if other != person)
             if has_affinity:
                 satisfied += 1
     return satisfied
@@ -66,7 +66,7 @@ def assign_groups_with_constraints(n: int, k: int, A: List[List[int]],  min_affi
     """
     Assigne les étudiants aux groupes en respectant les contraintes d'affinité.
     
-    Returns:
+    Retourne:
         - groups: Liste des groupes
         - group_scores: Scores de chaque groupe
         - constraint_satisfied: True si la contrainte minimale est respectée
@@ -78,8 +78,8 @@ def assign_groups_with_constraints(n: int, k: int, A: List[List[int]],  min_affi
     
     # Liste des étudiants à assigner
     remaining = list(range(n))
-    random.shuffle(remaining)
-    
+    random.shuffle(remaining)  # Mélanger pour une distribution aléatoire initiale
+
     # Fonction pour vérifier si une personne a au moins une affinité dans le groupe
     def has_affinity_in_group(group: List[int], idx: int) -> bool:
         return any(A[idx][peer] > 0 or A[peer][idx] > 0 for peer in group)
@@ -103,10 +103,9 @@ def assign_groups_with_constraints(n: int, k: int, A: List[List[int]],  min_affi
                 candidates.append((priority, score, random.random(), g_id))
         
         if candidates:
-            # Trier par priorité (contrainte respectée), puis par score, puis aléatoirement
+            # Trier par priorité (contrainte respectée), puis par score
             candidates.sort(reverse=True)
             _, _, _, best_group = candidates[0]
-            
             groups[best_group].append(idx)
             group_scores[best_group] = compute_group_score(groups[best_group], A)
     
@@ -145,45 +144,45 @@ def debug_group_affinity(group: List[int], A: List[List[int]], names: List[str])
                 total += pair_score
     print(f"  Score total calculé: {total}")
 
-def optimize_groups(filename: str, k: int, total_iterations: int = 1000) -> None:
+def optimize_groups(filename: str, k: int, total_iterations: int = 5000) -> None:
     """
     Fonction principale d'optimisation des groupes.
+    Elle utilise l'approche d'un algorithme glouton pour assigner les étudiants
+    à des groupes en respectant les contraintes d'affinité.
     """
+    # Charger les données
     print("Chargement des données...")
-    etudiants,  names, votes_par_index = load_data(filename)
+    etudiants, names, votes_par_index = load_data(filename)
     n = len(etudiants)
-    
+
     print(f"Nombre d'étudiants: {n}")
     print(f"Nombre de groupes souhaités: {k}")
     print(f"Nombre total d'itérations: {total_iterations}")
-    
+
     # Créer la matrice d'affinité
     A = create_affinity_matrix(n, votes_par_index)
-    
-    # Variables pour la meilleure solution globale
+
+    # Initialisation de la meilleure solution
     global_best_groups = None
     global_best_scores = None
     global_best_total_score = -1
     global_best_satisfied_count = 0
     global_best_iteration = 0
-    
-    
-    # Faire exactement 1000 itérations complètes
+
+    # Boucle d'optimisation gloutonne
     for iteration in range(total_iterations):
-        # Générer une solution avec contraintes flexibles (min_affinity_per_person = 0)
-        groups, group_scores, _ = assign_groups_with_constraints(
+        groups, group_scores, constraint_satisfied = assign_groups_with_constraints(
             n, k, A, min_affinity_per_person=0
         )
-        
+
+
         total_score = sum(group_scores)
         satisfied_count = count_satisfied_individuals(groups, A)
-        
-        # Vérifier si c'est la meilleure solution trouvée
+
         is_better = (
-            satisfied_count > global_best_satisfied_count or 
+            satisfied_count > global_best_satisfied_count or
             (satisfied_count == global_best_satisfied_count and total_score > global_best_total_score)
         )
-        
         if is_better:
             global_best_groups = [group.copy() for group in groups]
             global_best_scores = group_scores.copy()
@@ -191,53 +190,46 @@ def optimize_groups(filename: str, k: int, total_iterations: int = 1000) -> None
             global_best_satisfied_count = satisfied_count
             global_best_iteration = iteration + 1
 
+
+    if not constraint_satisfied:
+        print("Attention : Certaines personnes n'ont aucune affinité dans leur groupe.")
+
     
-    print(f"\nOptimisation terminée!")
+    print(f"\nOptimisation terminée !")
     print(f"Meilleure solution trouvée à l'itération {global_best_iteration}")
-    
-    # Utiliser la meilleure solution trouvée
-    best_groups = global_best_groups
-    best_scores = global_best_scores
-    best_total_score = global_best_total_score
-    best_satisfied_count = global_best_satisfied_count
-    
-    # Affichage des résultats
+
+    groups = global_best_groups
+    group_scores = global_best_scores
+    total_score = global_best_total_score
+    satisfied_count = global_best_satisfied_count
+
+    # Affichage des résultats finaux
     print(f"\n{'='*70}")
     print("RÉSULTATS FINAUX")
     print(f"{'='*70}")
-    print(f"Meilleure solution trouvée à l'itération: {global_best_iteration}")
-    print(f"Score total d'affinité: {best_total_score}")
-    print(f"Personnes avec au moins une affinité dans leur groupe: {best_satisfied_count}/{n}")
-    print(f"Taux de satisfaction: {best_satisfied_count/n*100:.1f}%")
-    
-    print(f"\nRépartition finale:\n")
-    for i, group in enumerate(best_groups):
-        noms = [names[idx] for idx in group]
-        score = best_scores[i]
-        # Compter les personnes satisfaites dans ce groupe
-        satisfied_in_group = 0
-        for person in group:
-            has_affinity = any(A[person][other] > 0 
-                             for other in group if other != person)
-            if has_affinity:
-                satisfied_in_group += 1
-        
-        print(f"Groupe {i+1} ({len(group)} personnes, score: {score}, "
-              f"{satisfied_in_group}/{len(group)} satisfaites):")
-        print(f"  {', '.join(noms)}")
-        
-        # Debug pour les groupes avec des anomalies apparentes
+    print(f"Score total d'affinité: {total_score}")
+    print(f"Personnes avec au moins une affinité dans leur groupe: {satisfied_count}/{n}")
+    print(f"Taux de satisfaction: {satisfied_count/n*100:.1f}%")
 
-        if  score < len(group):
-            print(f"\n Analyse détaillée (score {score} semble faible pour {satisfied_in_group} satisfaites):")
+    print(f"\nRépartition finale:\n")
+    for i, group in enumerate(groups):
+        noms = [names[idx] for idx in group]
+        score = group_scores[i]
+        satisfied_in_group = sum(
+            1 for person in group if any(A[person][other] > 0 for other in group if other != person)
+        )
+
+        print(f"Groupe {i+1} ({len(group)} personnes, score: {score}, {satisfied_in_group}/{len(group)} satisfaites):")
+        print(f"  {', '.join(noms)}")
+
+        if score < len(group):
+            print(f"Analyse détaillée (score {score} semble faible pour {satisfied_in_group} satisfaites):")
             debug_group_affinity(group, A, names)
-        
-        print()
+
 
 # Utilisation
 if __name__ == "__main__":
     # Paramètres
     filename = "data/etudiants_30_votes5.json"
-    k = 6  # nombre de groupes souhaités
-    
-    optimize_groups(filename, k, total_iterations=5000)
+    k = 6  # nombre de groupes souhaités    
+    optimize_groups(filename, k, total_iterations=10000)
