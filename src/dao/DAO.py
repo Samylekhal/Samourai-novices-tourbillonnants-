@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 from ..model.Teacher import Teacher
 from ..model.Project import Project
 from ..model.Student import Student
+from ..model.StudentForm import StudentForm
 from ..utils.Result import Result
 
 class DAO(ABC):
@@ -40,5 +41,26 @@ class DAO(ABC):
         Retrieve a student by their username.
         If the student does not exist, return a Result with success=False and an appropriate message.
         If there is an error in retrieving the student, return a Result with success=False and an error message.
+        """
+        pass
+
+    @abstractmethod
+    def get_students_by_project(self, project_id: int) -> Result[list[Student]]:
+        """
+        Retrieve a list of students associated with the given project ID.
+        """
+        pass
+
+    @abstractmethod
+    def get_student_forms_by_project(self, project_id: int) -> Result[list[StudentForm]]:
+        """
+        Retrieve all student forms for a given project ID.
+        """
+        pass
+
+    @abstractmethod
+    def student_i_voted_j(self, project_id: int, student_i: Student, student_j: Student) -> bool:
+        """
+        Return True if student_i voted for student_j in the given project, else False.
         """
         pass

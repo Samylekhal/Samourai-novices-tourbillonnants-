@@ -69,6 +69,13 @@
             "roles": "student",
             "first_name": "Léa",
             "last_name": "Fournier"
+        },
+        {
+            "username": "jean.valjean",
+            "password": "hello",
+            "roles": "student",
+            "first_name": "Jean",
+            "last_name": "Valjean"
         }
     ]
 }

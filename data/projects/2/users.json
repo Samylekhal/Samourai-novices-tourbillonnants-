@@ -1,0 +1,35 @@
+{
+    "users": {
+        "teachers": [
+            {
+                "username": "anthony.query"
+            }
+        ],
+        "students": [
+            {
+                "username": "marion.dupont"
+            },
+            {
+                "username": "pierre.martin"
+            },
+            {
+                "username": "lucie.lefevre"
+            },
+            {
+                "username": "emma.durand"
+            },
+            {
+                "username": "thomas.bernard"
+            },
+            {
+                "username": "julien.moreau"
+            },
+            {
+                "username": "lea.fournier"
+            },
+            {
+                "username": "jean.valjean"
+            }
+        ]
+    }
+}

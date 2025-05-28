@@ -58,3 +58,12 @@ operation_result = teacher_dashboard_project.close_votes_manually()  # Close vot
 print(operation_result)  # Print the result of closing votes manually
 # Print the final state of the project dashboard after closing votes
 print(teacher_dashboard_project)  # Print final state of the project dashboard after closing votes
+
+# Test get_student_forms_by_project from DAO using project id 1
+print("== Test get_student_forms_by_project from DAO using project id 1 ==\n")
+project_id = 1  # Assuming project ID 1 exists
+result = dao.get_student_forms_by_project(project_id)
+if result.success:
+    print(f"Student forms for project ID {project_id}:")
+    for form in result.data:
+        print(form)

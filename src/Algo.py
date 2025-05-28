@@ -8,7 +8,6 @@ def load_data(filename: str) -> Tuple[List[Dict], List[str], Dict[int, List[int]
         data = json.load(f)
     
     etudiants = data["formulaire"]["data"]
-    n = len(etudiants)
     
     # Mapping des IDs vers les indices
     id_to_index = {etu["id"]: i for i, etu in enumerate(etudiants)}
