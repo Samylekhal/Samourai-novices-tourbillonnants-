@@ -1,0 +1,12 @@
+{
+    "forms": [
+        {
+            "student_username": "pierre.martin",
+            "votes": {}
+        },
+        {
+            "student_username": "marion.dupont",
+            "votes": {}
+        }
+    ]
+}

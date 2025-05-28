@@ -16,11 +16,11 @@ class TeacherDashboardHome:
         self.dao = dao
         self.projects: list[Project] = dao.get_projects_by_teacher(self.teacher)
     
-    def new_project(self, name: str, num_votes: int) -> None:
+    def new_project(self, name: str, num_points: int) -> None:
         """
         Create a new project with the given name.
         """
-        project = self.dao.new_project(self.teacher, name, num_votes)
+        project = self.dao.new_project(self.teacher, name, num_points)
         self.projects.append(project)
     
     def get_project_dashboard_by_id(self, id: int) -> TeacherDashboardProject:

@@ -1,8 +1,3 @@
-# # Partie Connection Général (root de notre diagram de class sort of)
-
-# connection_manager = ConnectionManager() # Démarrage de l'application
-# teacher = connection_manager.login("anthony.quere", "hello") # on te demande de login 
-
 from src import *
 from datetime import datetime
 
@@ -16,7 +11,7 @@ teacher_dashboard_home = TeacherDashboardHome(teacher, dao)  # Logged in. Homepa
 print(teacher_dashboard_home)  # Print teacher dashboard with projects
 # Create a new project
 print("== Create a new project ==\n")
-teacher_dashboard_home.new_project(name="Mega Pattern", num_votes=5)  # When writing a new project name and hitting create project button
+teacher_dashboard_home.new_project(name="Mega Pattern", num_points=50)  # When writing a new project name and hitting create project button
 print(teacher_dashboard_home)  # Print teacher dashboard with a new project for anthony.query named "Design Pattern"
 # Access a specific project
 project_id = teacher_dashboard_home.projects[-1].id  # Most recently created project
@@ -29,7 +24,7 @@ teacher_dashboard_project = teacher_dashboard_home.get_project_dashboard_by_id(p
 print(teacher_dashboard_project)
 # Set the number of votes for the project
 print("== Set the number of votes for the project ==\n")
-teacher_dashboard_project.set_project_num_votes(10)  # Set number of votes to 10
+teacher_dashboard_project.set_project_num_points(100)  # Set number of votes to 10
 print(teacher_dashboard_project)  # Print updated project dashboard with new number of votes
 # Add students to the project
 print("== Add students to the project ==\n")

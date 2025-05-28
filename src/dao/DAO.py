@@ -22,7 +22,7 @@ class DAO(ABC):
         pass
 
     @abstractmethod
-    def new_project(self, teacher: Teacher, project_name: str, num_votes: int) -> Project:
+    def new_project(self, teacher: Teacher, project_name: str, num_points: int) -> Project:
         """
         Create a new project with a unique ID and return the created Project.
         """
@@ -31,7 +31,7 @@ class DAO(ABC):
     @abstractmethod
     def update_project(self, project: Project) -> None:
         """
-        Update an existing project's attributes (like num_votes).
+        Update an existing project's attributes (like num_points).
         """
         pass
 
@@ -62,5 +62,12 @@ class DAO(ABC):
     def student_i_voted_j(self, project_id: int, student_i: Student, student_j: Student) -> bool:
         """
         Return True if student_i voted for student_j in the given project, else False.
+        """
+        pass
+
+    @abstractmethod
+    def get_projects_by_student(self, student: Student) -> list[Project]:
+        """
+        Retrieve a list of projects associated with a student.
         """
         pass

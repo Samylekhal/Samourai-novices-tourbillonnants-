@@ -16,12 +16,10 @@ class TeacherDashboardProject:
         self.dao = dao
         self.project = project
 
-    def set_project_num_votes(self, num_votes: int):
-        """
-        Set the number of votes for the project.
-        """
-        self.project.num_votes = num_votes
+    def set_project_num_points(self, num_points: int):
+        self.project.num_points = num_points
         self.dao.update_project(self.project)
+
 
     def add_student(self, student_username: str) -> Result[Student]:
         result = self.dao.get_student_by_username(student_username)

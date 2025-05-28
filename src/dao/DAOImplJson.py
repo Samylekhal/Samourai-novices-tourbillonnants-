@@ -44,13 +44,13 @@ class DAOImplJson(DAO):
                         attributes = json.load(f)
                         project_id = int(attributes["id"])
                         project_name = attributes["name"]
-                        project_num_votes = attributes["num_votes"]
-                        project = Project(project_id, project_name, project_num_votes)
+                        project_num_points = attributes["num_points"]
+                        project = Project(project_id, project_name, project_num_points)
                         projects.append(project)
 
         return projects
 
-    def new_project(self, teacher: Teacher, project_name: str, num_votes: int) -> Project:
+    def new_project(self, teacher: Teacher, project_name: str, num_points: int) -> Project:
         project_id = self.getFreeProjectId()
         project_path = os.path.join(self.filepath, "projects", str(project_id))
         os.makedirs(project_path, exist_ok=True)
@@ -61,7 +61,7 @@ class DAOImplJson(DAO):
             json.dump({
                 "id": str(project_id),
                 "name": project_name,
-                "num_votes": num_votes
+                "num_points": num_points
             }, f, indent=4)
 
         # Write users.json with only the teacher
@@ -74,12 +74,21 @@ class DAOImplJson(DAO):
                 }
             }, f, indent=4)
 
-        return Project(project_id, project_name, num_votes)
+        # Write empty forms.json skeleton (students will be added later)
+        forms_path = os.path.join(project_path, "forms.json")
+        with open(forms_path, "w") as f:
+            json.dump({
+                "forms": []
+            }, f, indent=4)
+
+        return Project(project_id, project_name, num_points)
+
     
     def update_project(self, project: Project) -> None:
         project_path = os.path.join(self.filepath, "projects", str(project.id))
         attributes_path = os.path.join(project_path, "projet_attributes.json")
         users_path = os.path.join(project_path, "users.json")
+        forms_path = os.path.join(project_path, "forms.json")
 
         if not os.path.exists(attributes_path):
             raise FileNotFoundError(f"No attributes file found for project ID {project.id}")
@@ -88,7 +97,7 @@ class DAOImplJson(DAO):
         with open(attributes_path, "r") as f:
             attributes = json.load(f)
 
-        attributes["num_votes"] = project.num_votes
+        attributes["num_points"] = project.num_points
 
         with open(attributes_path, "w") as f:
             json.dump(attributes, f, indent=4)
@@ -97,7 +106,6 @@ class DAOImplJson(DAO):
         teachers = [{"username": self.teacher.username}] if hasattr(self, "teacher") else []
         students = [{"username": s.username} for s in project.students]
 
-        # Preserve existing teachers if available
         if os.path.exists(users_path):
             with open(users_path, "r") as f:
                 current_users = json.load(f).get("users", {})
@@ -112,6 +120,34 @@ class DAOImplJson(DAO):
 
         with open(users_path, "w") as f:
             json.dump(new_users, f, indent=4)
+
+        # --- Update forms.json to match student list ---
+        forms_data = []
+        if os.path.exists(forms_path):
+            with open(forms_path, "r") as f:
+                try:
+                    forms_data = json.load(f).get("forms", [])
+                except json.JSONDecodeError:
+                    forms_data = []
+
+        # Create map for easier lookup
+        username_to_form = {form["student_username"]: form for form in forms_data if "student_username" in form}
+
+        current_usernames = set(s.username for s in project.students)
+        updated_forms = []
+
+        for username in current_usernames:
+            if username in username_to_form:
+                updated_forms.append(username_to_form[username])  # preserve existing votes
+            else:
+                updated_forms.append({
+                    "student_username": username,
+                    "votes": {}
+                })
+
+        with open(forms_path, "w") as f:
+            json.dump({"forms": updated_forms}, f, indent=4)
+
 
 
     def getFreeProjectId(self) -> int:
@@ -214,18 +250,24 @@ class DAOImplJson(DAO):
         student_forms = []
         for entry in forms_data:
             student_username = entry.get("student_username")
-            vote_usernames = list(entry.get("votes", {}).values())
+            vote_dict = entry.get("votes", {})
 
             if student_username not in username_to_student:
                 continue
 
             student = username_to_student[student_username]
-            votes = [username_to_student[v] for v in vote_usernames if v in username_to_student]
+            votes: list[tuple[Student, int]] = []
+
+            for voted_username, points in vote_dict.items():
+                voted_student = username_to_student.get(voted_username)
+                if voted_student and isinstance(points, int):
+                    votes.append((voted_student, points))
 
             form = StudentForm(student, votes)
             student_forms.append(form)
 
         return Result(True, f"Loaded {len(student_forms)} student forms for project {project_id}.", data=student_forms)
+
 
     def student_i_voted_j(self, project_id: int, student_i: Student, student_j: Student) -> bool:
         forms_path = os.path.join(self.filepath, "projects", str(project_id), "forms.json")
@@ -245,3 +287,32 @@ class DAOImplJson(DAO):
                 return student_j.username in vote_usernames
 
         return False
+
+    def get_projects_by_student(self, student: Student) -> list[Project]:
+        projects = []
+        base_path = os.path.join(self.filepath, "projects")
+
+        for folder_name in os.listdir(base_path):
+            project_folder = os.path.join(base_path, folder_name)
+
+            if os.path.isdir(project_folder):
+                users_file = os.path.join(project_folder, "users.json")
+                attributes_file = os.path.join(project_folder, "projet_attributes.json")
+
+                if not os.path.exists(users_file) or not os.path.exists(attributes_file):
+                    continue
+
+                with open(users_file, "r") as f:
+                    users_data = json.load(f)
+                    student_usernames = [s["username"] for s in users_data.get("users", {}).get("students", [])]
+
+                if student.username in student_usernames:
+                    with open(attributes_file, "r") as f:
+                        attributes = json.load(f)
+                        project_id = int(attributes["id"])
+                        project_name = attributes["name"]
+                        project_num_points = attributes["num_points"]
+                        project = Project(project_id, project_name, project_num_points)
+                        projects.append(project)
+
+        return projects
