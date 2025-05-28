@@ -1,0 +1,74 @@
+{
+    "users": [
+        {
+            "username": "anthony.quere",
+            "password": "hello",
+            "roles": "teacher",
+            "first_name": "Anthony",
+            "last_name": "Quéré"
+        },
+        {
+            "username": "jean.dupont",
+            "password": "hello",
+            "roles": "teacher",
+            "first_name": "Jean",
+            "last_name": "Dupont"
+        },
+        {
+            "username": "benjamin.dewitte",
+            "password": "hello",
+            "roles": "teacher",
+            "first_name": "Benjamin",
+            "last_name": "Dewitte"
+        },
+        {
+            "username": "marion.dupont",
+            "password": "hello",
+            "roles": "student",
+            "first_name": "Marion",
+            "last_name": "Dupont"
+        },
+        {
+            "username": "pierre.martin",
+            "password": "hello",
+            "roles": "student",
+            "first_name": "Pierre",
+            "last_name": "Martin"
+        },
+        {
+            "username": "lucie.lefevre",
+            "password": "hello",
+            "roles": "student",
+            "first_name": "Lucie",
+            "last_name": "Lefèvre"
+        },
+        {
+            "username": "emma.durand",
+            "password": "hello",
+            "roles": "student",
+            "first_name": "Emma",
+            "last_name": "Durand"
+        },
+        {
+            "username": "thomas.bernard",
+            "password": "hello",
+            "roles": "student",
+            "first_name": "Thomas",
+            "last_name": "Bernard"
+        },
+        {
+            "username": "julien.moreau",
+            "password": "hello",
+            "roles": "student",
+            "first_name": "Julien",
+            "last_name": "Moreau"
+        },
+        {
+            "username": "lea.fournier",
+            "password": "hello",
+            "roles": "student",
+            "first_name": "Léa",
+            "last_name": "Fournier"
+        }
+    ]
+}
