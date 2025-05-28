@@ -1,0 +1,10 @@
+{
+    "users": {
+        "teachers": [
+            {
+                "username": "anthony.query"
+            }
+        ],
+        "students": []
+    }
+}

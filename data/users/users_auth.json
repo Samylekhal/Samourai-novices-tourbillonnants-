@@ -1,11 +1,11 @@
 {
     "users": [
         {
-            "username": "anthony.quere",
+            "username": "anthony.query",
             "password": "hello",
             "roles": "teacher",
             "first_name": "Anthony",
-            "last_name": "Quéré"
+            "last_name": "Query"
         },
         {
             "username": "jean.dupont",

@@ -9,6 +9,7 @@
 
 import os
 import json
+from datetime import datetime
 from .DAO import DAO
 from ..model.Project import Project
 from ..model.Teacher import Teacher
@@ -45,7 +46,9 @@ class DAOImplJson(DAO):
                         project_id = int(attributes["id"])
                         project_name = attributes["name"]
                         project_num_points = attributes["num_points"]
-                        project = Project(project_id, project_name, project_num_points)
+                        vote_close_time_str = attributes.get("vote_close_time")
+                        project_vote_close_time = datetime.fromisoformat(vote_close_time_str) if vote_close_time_str else None
+                        project = Project(project_id, project_name, project_num_points, vote_close_time=project_vote_close_time)
                         projects.append(project)
 
         return projects
@@ -98,9 +101,14 @@ class DAOImplJson(DAO):
             attributes = json.load(f)
 
         attributes["num_points"] = project.num_points
+        attributes["vote_close_time"] = (
+            project.vote_close_time.isoformat() if project.vote_close_time else None
+        )
+        attributes["closed_vote"] = project.closed_vote
 
         with open(attributes_path, "w") as f:
             json.dump(attributes, f, indent=4)
+
 
         # --- Update users.json with students and teachers ---
         teachers = [{"username": self.teacher.username}] if hasattr(self, "teacher") else []
@@ -132,6 +140,13 @@ class DAOImplJson(DAO):
 
         # Create map for easier lookup
         username_to_form = {form["student_username"]: form for form in forms_data if "student_username" in form}
+        # Remove votes that target students no longer in the project
+        valid_usernames = set(s.username for s in project.students)
+        for form in username_to_form.values():
+            votes = form.get("votes", {})
+            cleaned_votes = {u: pts for u, pts in votes.items() if u in valid_usernames}
+            form["votes"] = cleaned_votes
+
 
         current_usernames = set(s.username for s in project.students)
         updated_forms = []
@@ -311,7 +326,9 @@ class DAOImplJson(DAO):
                         project_id = int(attributes["id"])
                         project_name = attributes["name"]
                         project_num_points = attributes["num_points"]
-                        project = Project(project_id, project_name, project_num_points)
+                        vote_close_time_str = attributes.get("vote_close_time")
+                        project_vote_close_time = datetime.fromisoformat(vote_close_time_str) if vote_close_time_str else None
+                        project = Project(project_id, project_name, project_num_points, vote_close_time=project_vote_close_time)
                         projects.append(project)
 
         return projects

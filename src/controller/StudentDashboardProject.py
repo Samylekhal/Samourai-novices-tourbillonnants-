@@ -8,6 +8,14 @@ class StudentDashboardProject:
         self.student = student
         self.project = project
         self.dao = dao
+
+        # Make sure we populate self.project.students correctly
+        students_result = self.dao.get_students_by_project(project.id)
+        if students_result.success:
+            self.project.students = students_result.data
+        else:
+            self.project.students = []
+
         # Load the student's own form
         result = self.dao.get_student_forms_by_project(project.id)
         if result.success:
@@ -19,9 +27,9 @@ class StudentDashboardProject:
         else:
             self.student_form = StudentForm(student, [])
 
-        # Get the number of remaining points for this student
         points_result = self.dao.get_remaining_points_for_student(project.id, student)
         self.points = points_result.data if points_result.success else 0
+
 
 
     def attribute_points_to_student(self, recipient: Student, points: int) -> str:

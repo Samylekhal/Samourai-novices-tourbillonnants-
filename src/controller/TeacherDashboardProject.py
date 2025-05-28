@@ -14,6 +14,12 @@ class TeacherDashboardProject:
     def __init__(self, teacher: Teacher, dao: DAO, project: Project):
         self.teacher = teacher
         self.dao = dao
+        students_result = self.dao.get_students_by_project(project.id)
+        if students_result.success:
+            project.students = students_result.data
+        else:
+            project.students = []
+
         self.project = project
 
     def set_project_num_points(self, num_points: int):
@@ -40,9 +46,9 @@ class TeacherDashboardProject:
         for student in self.project.students:
             if student.username == student_username:
                 self.project.students.remove(student)
+                self.dao.update_project(self.project)
                 return Result(True, f"Student '{student_username}' removed successfully.", data=student)
         
-        self.dao.update_project(self.project)
         return Result(False, f"Student '{student_username}' is not in the project.")
 
     def close_votes_manually(self) -> Result[None]:
@@ -57,28 +63,63 @@ class TeacherDashboardProject:
     def set_vote_close_time(self, close_time: datetime) -> Result[None]:
         if self.project.closed_vote:
             return Result(False, "Cannot set vote close time because votes are already closed.")
-        current_datetime = datetime.now()
-        if close_time < current_datetime:
+        
+        if close_time < datetime.now():
             return Result(False, "Cannot set vote close time that comes before the current date.")
 
-
         self.project.vote_close_time = close_time
+        self.dao.update_project(self.project) 
         return Result(True, f"Vote close time set to {close_time.isoformat()} for project '{self.project.name}'.")
+
+
+    def reopen_votes(self) -> Result[None]:
+        if not self.project.closed_vote:
+            return Result(False, "Votes are already open.")
+        
+        self.project.closed_vote = False
+        self.project.vote_close_time = None
+        self.dao.update_project(self.project)
+        return Result(True, f"Votes reopened for project '{self.project.name}'.")
+
 
     def cluster_students(self, k: int, total_iterations: int = 5000) -> Result[None]:
         """
         Cluster students based on their project preferences.
         This is a placeholder for the actual clustering logic.
         """
-        def create_affinity_matrix(n: int, votes_par_index: Dict[int, List[int]]) -> List[List[int]]:
-            """Crée la matrice d'affinité (0 = aucun vote, 1 = vote unilatéral, 2 = mutuel)."""
+
+        student_forms = self.dao.get_student_forms_by_project(self.project.id).data
+        usernames = [sf.student.username for sf in student_forms]
+        votes_par_index = {
+            sf.student.username: [vote.username for vote in sf.votes]
+            for sf in student_forms
+        }
+
+        def create_affinity_matrix(usernames: List[str], votes_par_index: Dict[str, List[str]]) -> List[List[int]]:
+            """
+            Crée la matrice d'affinité (0 = aucun vote, 1 = vote unilatéral) à partir des usernames.
+        
+            Args:
+                usernames: liste ordonnée des usernames (indexés de 0 à n-1)
+                votes_par_index: dictionnaire {votant: [voté1, voté2, ...]}
+
+            Returns:
+                Matrice carrée A[n][n] des affinités.
+            """
+            n = len(usernames)
+            name_to_index = {username: i for i, username in enumerate(usernames)}
             A = [[0] * n for _ in range(n)]
-            
-            # Remplir avec les votes unilatéraux
-            for i in range(n):
-                for j in votes_par_index[i]:
-                    A[i][j] = 1
-            
+
+            for voter, voted_list in votes_par_index.items():
+                i = name_to_index.get(voter)
+                if i is None:
+                    continue
+                for voted in voted_list:
+                    j = name_to_index.get(voted)
+                    if j is not None and i != j:
+                        A[i][j] = 1
+            print(f"Created affinity matrix of size {n}x{n} based on votes.")
+            print(A)
             return A
 
         def compute_group_score(group: List[int], A: List[List[int]]) -> int:
@@ -204,7 +245,7 @@ class TeacherDashboardProject:
             print(f"Nombre total d'itérations: {total_iterations}")
 
             # Créer la matrice d'affinité
-            A = create_affinity_matrix(n, votes_par_index)
+            A = create_affinity_matrix(etudiants, votes_par_index)
 
             # Initialisation de la meilleure solution
             global_best_groups = None
@@ -218,8 +259,6 @@ class TeacherDashboardProject:
                 groups, group_scores, constraint_satisfied = assign_groups_with_constraints(
                     n, k, A, min_affinity_per_person=0
                 )
-
-
                 total_score = sum(group_scores)
                 satisfied_count = count_satisfied_individuals(groups, A)
 
@@ -256,19 +295,28 @@ class TeacherDashboardProject:
             print(f"Taux de satisfaction: {satisfied_count/n*100:.1f}%")
 
             print(f"\nRépartition finale:\n")
+            print(f"GRRRROUUUPS: {groups}")
             for i, group in enumerate(groups):
-                noms = [names[idx] for idx in group]
+                
                 score = group_scores[i]
                 satisfied_in_group = sum(
                     1 for person in group if any(A[person][other] > 0 for other in group if other != person)
                 )
 
                 print(f"Groupe {i+1} ({len(group)} personnes, score: {score}, {satisfied_in_group}/{len(group)} satisfaites):")
-                print(f"  {', '.join(noms)}")
+                #print(f"  {', '.join(noms)}")
 
                 if score < len(group):
                     print(f"Analyse détaillée (score {score} semble faible pour {satisfied_in_group} satisfaites):")
-                    debug_group_affinity(group, A, names)
+                 #   debug_group_affinity(group, A, names)
+        
+        students = self.dao.get_students_by_project(self.project.id).data
+        etudiants = [s.username for s in students]
+        student_forms = self.dao.get_student_forms_by_project(self.project.id).data
+        votes_par_index = {sf.student.username: [vote.username for vote in sf.votes] for sf in student_forms}
+        n = len(etudiants)
+        optimize_groups(k, votes_par_index, n, total_iterations)
+        return Result(True, "Clustering students based on project preferences is not yet implemented.")
         
         students = self.dao.get_students_by_project(self.project.id).data
         etudiants = [s.username for s in students]
