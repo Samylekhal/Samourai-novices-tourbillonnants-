@@ -24,7 +24,7 @@ teacher_dashboard_project = teacher_dashboard_home.get_project_dashboard_by_id(p
 print(teacher_dashboard_project)
 # Set the number of votes for the project
 print("== Set the number of votes for the project ==\n")
-teacher_dashboard_project.set_project_num_points(100)  # Set number of votes to 10
+teacher_dashboard_project.set_project_num_points(10)  # Set number of votes to 10
 print(teacher_dashboard_project)  # Print updated project dashboard with new number of votes
 # Add students to the project
 print("== Add students to the project ==\n")
@@ -43,6 +43,13 @@ print(teacher_dashboard_project)  # Print final state of the project dashboard w
 # Set the vote close time for the project
 print("== Set the vote close time for the project ==\n")
 close_time = datetime(2025, 5, 29, 23, 59, 59)  # Set a close time for the votes
+operation_result = teacher_dashboard_project.set_vote_close_time(close_time)  # Set the vote close time
+print(operation_result)  # Print the result of setting the vote close time
+# print the final state of the project dashboard after setting the vote close time
+print(teacher_dashboard_project)  # Print final state of the project dashboard with vote close time set
+# Set the vote close time before current date
+print("== Set the vote close time before current date for the project ==\n")
+close_time = datetime(2024, 5, 29, 23, 59, 59)  # Set a close time for the votes
 operation_result = teacher_dashboard_project.set_vote_close_time(close_time)  # Set the vote close time
 print(operation_result)  # Print the result of setting the vote close time
 # print the final state of the project dashboard after setting the vote close time

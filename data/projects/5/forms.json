@@ -6,7 +6,11 @@
         },
         {
             "student_username": "marion.dupont",
-            "votes": {}
+            "votes": {
+                "pierre.martin": 25,
+                "lucie.lefevre": 30,
+                "emma.durand": 30
+            }
         }
     ]
 }

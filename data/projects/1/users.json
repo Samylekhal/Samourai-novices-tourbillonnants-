@@ -6,7 +6,12 @@
             }
         ],
         "students": [
-            
+            {
+                "username": "marion.dupont"
+            },
+            {
+                "username": "pierre.martin"
+            }
         ]
     }
 }

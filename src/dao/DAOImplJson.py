@@ -149,7 +149,6 @@ class DAOImplJson(DAO):
             json.dump({"forms": updated_forms}, f, indent=4)
 
 
-
     def getFreeProjectId(self) -> int:
         base_path = os.path.join(self.filepath, "projects")
         used_ids = set()
@@ -316,3 +315,64 @@ class DAOImplJson(DAO):
                         projects.append(project)
 
         return projects
+
+    def update_student_form(self, project_id: int, updated_form: StudentForm) -> Result[None]:
+        forms_path = os.path.join(self.filepath, "projects", str(project_id), "forms.json")
+        if not os.path.exists(forms_path):
+            return Result(False, "forms.json does not exist for this project.")
+
+        try:
+            with open(forms_path, "r") as f:
+                data = json.load(f)
+                forms = data.get("forms", [])
+        except Exception as e:
+            return Result(False, f"Failed to read forms.json: {str(e)}")
+
+        found = False
+        updated_forms = []
+        for form in forms:
+            if form.get("student_username") == updated_form.student.username:
+                found = True
+                updated_vote_map = {s.username: pts for s, pts in updated_form.votes}
+                updated_forms.append({
+                    "student_username": updated_form.student.username,
+                    "votes": updated_vote_map
+                })
+            else:
+                updated_forms.append(form)
+
+        if not found:
+            return Result(False, "Student form not found in project.")
+
+        try:
+            with open(forms_path, "w") as f:
+                json.dump({"forms": updated_forms}, f, indent=4)
+            return Result(True, "Student form updated.")
+        except Exception as e:
+            return Result(False, f"Failed to write forms.json: {str(e)}")
+
+    def get_remaining_points_for_student(self, project_id: int, student: Student) -> Result[int]:
+        forms_path = os.path.join(self.filepath, "projects", str(project_id), "forms.json")
+        attributes_path = os.path.join(self.filepath, "projects", str(project_id), "projet_attributes.json")
+
+        if not os.path.exists(forms_path) or not os.path.exists(attributes_path):
+            return Result(False, "Required files missing.")
+
+        try:
+            with open(forms_path, "r") as f:
+                forms_data = json.load(f).get("forms", [])
+            with open(attributes_path, "r") as f:
+                project_data = json.load(f)
+        except Exception as e:
+            return Result(False, f"Error reading project data: {str(e)}")
+
+        max_points = int(project_data.get("num_points", 0))
+        student_form = next((form for form in forms_data if form.get("student_username") == student.username), None)
+
+        if not student_form:
+            return Result(True, "Student has not used any points yet.", data=max_points)
+
+        used_points = sum(student_form.get("votes", {}).values())
+        remaining_points = max_points - used_points
+
+        return Result(True, "Remaining points calculated.", data=max(remaining_points, 0))

@@ -57,6 +57,10 @@ class TeacherDashboardProject:
     def set_vote_close_time(self, close_time: datetime) -> Result[None]:
         if self.project.closed_vote:
             return Result(False, "Cannot set vote close time because votes are already closed.")
+        current_datetime = datetime.now()
+        if close_time < current_datetime:
+            return Result(False, "Cannot set vote close time that comes before the current date.")
+
 
         self.project.vote_close_time = close_time
         return Result(True, f"Vote close time set to {close_time.isoformat()} for project '{self.project.name}'.")

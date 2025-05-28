@@ -71,3 +71,18 @@ class DAO(ABC):
         Retrieve a list of projects associated with a student.
         """
         pass
+
+    @abstractmethod
+    def update_student_form(self, project_id: int, updated_form: StudentForm) -> Result[None]:
+        """
+        Update the student form in forms.json for the specified project.
+        Replaces the form entry corresponding to the student with updated votes.
+        """
+        pass
+
+    @abstractmethod
+    def get_remaining_points_for_student(self, project_id: int, student: Student) -> Result[int]:
+        """
+        Returns the number of points the student has left to allocate in a given project.
+        """
+        pass

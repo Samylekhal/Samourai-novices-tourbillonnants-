@@ -12,7 +12,7 @@ class StudentDashboardHome:
     def get_project_dashboard_by_id(self, project_id: int) -> StudentDashboardProject:
         for project in self.projects:
             if project.id == project_id:
-                return StudentDashboardProject(self.student, self.dao, project)
+                return StudentDashboardProject(self.student, project, self.dao)
         raise ValueError(f"Project with ID {project_id} not found for this student.")
 
     def __str__(self):
